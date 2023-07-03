@@ -40,34 +40,13 @@
 このパッケージをインストールするには、以下の手順に従ってください。
 
 1. [こちら](https://docs.ros.org/en/humble/Installation.html)の手順に従って、ROS 2 Humbleをインストールしてください。
-2. このリポジトリをワークスペースにクローンしてください:
+2. [micro-ROS](https://micro.ros.org/) Agent のセットアップ: *(実機を動かす場合のみ必要)*
 
    ```bash
-   $ mkdir -p ~/ros2_ws/src
-   $ cd ~/ros2_ws/src
-   $ git clone https://github.com/vstoneofficial/mecanumrover3_ros2.git --recurse-submodules
-   $ git clone -b $ROS_DISTRO https://github.com/vstoneofficial/vs_rover_options_description.git  # 「任意」オプションを表示するため
-   $ rosdep install -r --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
-   ```
-
-3. ワークスペースをビルド:
-
-   ```bash
-   $ cd ~/ros2_ws
-   $ colcon build
-   ```
-
-4. ワークスペースのオーバレイ作業:
-
-   ```bash
-   $ source ~/ros2_ws/install/setup.bash
-   ```
-
-5. 「micro-ROS Agent」をインストール: (実機を動かす場合のみ必要)
-
-   ```bash
-   $ cd ~/ros2_ws
-   $ git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+   $ mkdir -p ~/uros_ws/src
+   $ cd ~/uros_ws/src
+   $ git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git
+   $ cd ~/uros_ws
    $ rosdep update && rosdep install --from-paths src --ignore-src -y
    $ colcon build
    $ source install/local_setup.bash
@@ -77,10 +56,34 @@
    $ source install/local_setup.bash
    ```
 
-6. 環境のセットアップ: ビルドされたパッケージを使用するために、環境をセットアップする必要があります。
+3. このリポジトリをワークスペースにクローンしてください:
 
    ```bash
-   $ source install/setup.bash
+   $ mkdir -p ~/ros2_ws/src
+   $ cd ~/ros2_ws/src
+   $ git clone https://github.com/vstoneofficial/mecanumrover3_ros2.git --recurse-submodules
+   $ git clone -b $ROS_DISTRO https://github.com/vstoneofficial/vs_rover_options_description.git  # オプションを表示するため
+   $ rosdep install -r --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
+   ```
+
+4. ワークスペースをビルド:
+
+   ```bash
+   $ cd ~/ros2_ws
+   $ colcon build --symlink-install
+   ```
+
+5. ワークスペースのオーバレイ作業:
+
+   ```bash
+   $ source ~/ros2_ws/install/local_setup.bash
+   ```
+
+6. シェルを起動時にワークスペースがオーバーレイされるように設定します。
+
+   ```bash
+   $ echo "source ~/uros_ws/install/local_setup.bash" >> ~/.bashrc 
+   $ echo "source ~/ros2_ws/install/local_setup.bash" >> ~/.bashrc
    ```
 
 ## 使用方法
@@ -93,13 +96,18 @@
    ```
 
 - **メカナムローバー（実機）との通信**: ROS 2とMicro-ROSを統合するためのエージェントノードを起動。
-   ```
-   $ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0 -v4
-   ```
+  - 有線シリアル接続の場合:
+      ```
+      $ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0 -v4
+      ```
+  - Wi-Fi 接続の場合:
+      ```
+      $ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
+      ```
 
 - **odometryをpublish**: pub_odomノードとrviz上可視化
    ```
-   $  ros2 launch mecanumrover3_bringup robot.launch.py
+   $ ros2 launch mecanumrover3_bringup robot.launch.py
    ```
 
 - **キーボードで操作**: キーボードを使用してロボットを操作するためのノードを起動。
