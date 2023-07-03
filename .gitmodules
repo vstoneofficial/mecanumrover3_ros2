@@ -1,0 +1,4 @@
+[submodule "mecanumrover_description"]
+	path = mecanumrover_description
+	url = https://github.com/vstoneofficial/mecanumrover_description.git
+	branch = humble
