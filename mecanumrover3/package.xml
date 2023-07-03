@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>mecanumrover3</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>Metapackage that contains all essential packages for Mecanumrover Ver.3.0</description>
   <author email="jie@vstone.co.jp">Jie</author>
   <maintainer email="infodesk@vstone.co.jp">Vstone</maintainer>

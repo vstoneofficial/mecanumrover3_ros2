@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>mecanumrover3_bringup</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>Launch files and scripts needed to bring Mecanumrover Ver.3.0 into a running state.</description>
   <author email="jie@vstone.co.jp">Jie</author>
   <maintainer email="infodesk@vstone.co.jp">Vstone</maintainer>
