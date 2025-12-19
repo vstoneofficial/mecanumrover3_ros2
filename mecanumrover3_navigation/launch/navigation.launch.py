@@ -32,7 +32,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('mecanumrover3_navigation'),
             'maps',
-            'score500-2.yaml'))  # change this to your own map for navigation
+            'test.yaml'))  # change this to your own map for navigation
 
     param_dir = LaunchConfiguration(
         'params_file',
@@ -80,3 +80,4 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen'),
     ])
+

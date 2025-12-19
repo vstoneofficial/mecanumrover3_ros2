@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>mecanumrover3_navigation</name>
+  <name>mecanumrover3_gazebo</name>
   <version>1.1.0</version>
-  <description>slam_tools and nav2 samples for Mecanumrover Ver.3.0</description>
+  <description>Gazebo bringup for Megarover3 (4WD, ros2_control)</description>
   <maintainer email="infodesk@vstone.co.jp">Vstone</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  
+
   <depend>launch</depend>
   <depend>launch_ros</depend>
   <depend>ament_index_python</depend>
@@ -16,7 +16,7 @@
   <depend>slam_toolbox</depend>
   <depend>mecanumrover_description</depend>
   <depend>mecanumrover3_bringup</depend>
-
+  
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
@@ -24,3 +24,4 @@
     <build_type>ament_cmake</build_type>
   </export>
 </package>
+

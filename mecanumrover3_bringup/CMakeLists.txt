@@ -5,19 +5,17 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
 find_package(rclcpp REQUIRED)
-# find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(gazebo_msgs REQUIRED)
 
-
+# pub_odom
 add_executable(pub_odom src/pub_odom.cpp)
 ament_target_dependencies(
   pub_odom
@@ -29,23 +27,56 @@ ament_target_dependencies(
   tf2
 )
 
+# rover_gamepad
+add_executable(rover_gamepad src/rover_gamepad.cpp)
+ament_target_dependencies(
+  rover_gamepad
+  rclcpp
+  geometry_msgs
+  sensor_msgs
+)
+
+# rover_gamepad_tty
+add_executable(rover_gamepad_tty src/rover_gamepad.cpp)
+ament_target_dependencies(
+  rover_gamepad_tty
+  rclcpp
+  geometry_msgs
+  sensor_msgs
+)
+
+# gazebo_odom_bridge
+add_executable(gazebo_odom_bridge src/gazebo_odom_bridge.cpp)
+ament_target_dependencies(
+  gazebo_odom_bridge
+  rclcpp
+  geometry_msgs
+  nav_msgs
+  tf2_geometry_msgs
+  tf2_ros
+  tf2
+  gazebo_msgs
+)
+
 install(TARGETS
   pub_odom
-  DESTINATION lib/${PROJECT_NAME})
+  rover_gamepad
+  rover_gamepad_tty
+  gazebo_odom_bridge
+  DESTINATION lib/${PROJECT_NAME}
+)
 
-install(DIRECTORY launch rviz params
-  DESTINATION share/${PROJECT_NAME})
+install(
+  DIRECTORY launch rviz params
+  DESTINATION share/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
   set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_package()
+
