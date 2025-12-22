@@ -321,7 +321,7 @@ LRFに関するパラメータは[TG30.yaml](./mecanumrover3_bringup/params/TG30
       ```
       ros2 launch mecanumrover3_navigation navigation.launch.py rover:=mecanum3 map:=YOUR_MAP_NAME
       ```
-- メカナムローバーVer.3.0用の   4WDSローバー用のNavigation2のパラメータは`mecanumrover3_navigation`パッケージの[`config`](./mecanumrover3_navigation/config/) フォルダにあります。  
+- メカナムローバーVer.3.0用のNavigation2のパラメータは`mecanumrover3_navigation`パッケージの[`config`](./mecanumrover3_navigation/config/) フォルダにあります。  
 roverタイプごとにパラメータファイルが分かれていますので、使用しているロボットに合わせて調整してください。
 
 > **Warning**  
