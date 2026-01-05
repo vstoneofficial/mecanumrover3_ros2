@@ -77,8 +77,14 @@ def _create_urdf_and_rsp(context, *args, **kwargs):
 
     if rover == "mecanum3":
         xacro_file = os.path.join(urdf_dir, "mecanum3.xacro")
-    else:
+    elif rover == "g120a":
         xacro_file = os.path.join(urdf_dir, "g120a.xacro")
+    elif rover == "g40a_lb":
+        xacro_file = os.path.join(urdf_dir, "g40a_lb.xacro")
+    else:
+        raise RuntimeError(
+            f"[gazebo_bringup] Unknown rover type: {rover}"
+        )
 
     fd, urdf_path = tempfile.mkstemp(prefix="robot_", suffix=".urdf")
     os.close(fd)

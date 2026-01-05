@@ -46,8 +46,12 @@ def generate_launch_description():
     # --------------------------------------------------
     auto_params_file = PythonExpression([
         '"', nav_pkg, '/config/',
-        '" + ("mecanum3_nav2_params.yaml" if "', rover,
-        '" == "mecanum3" else "g120a_nav2_params.yaml")'
+        '" + ('
+        '"mecanum3_nav2_params.yaml" if "', rover, '" == "mecanum3" else '
+        '"g120a_nav2_params.yaml" if "', rover, '" == "g120a" else '
+        '"g40a_lb_nav2_params.yaml" if "', rover, '" == "g40a_lb" else '
+        '"nav2_params.yaml"'
+        ')'
     ])
 
     # --------------------------------------------------
@@ -112,7 +116,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'rover',
             default_value='mecanum3',
-            description='Rover type: mecanum3 or g120a'
+            description='Rover type: mecanum3 , g120a , g40a_lb'
         ),
 
         DeclareLaunchArgument(
