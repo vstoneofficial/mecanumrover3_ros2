@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # English comments only in code.
@@ -20,17 +20,17 @@ def generate_launch_description():
     # Launch arguments
     # --------------------------------------------------
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-    gui          = LaunchConfiguration('gui', default='true')
-    verbose      = LaunchConfiguration('verbose', default='false')
-    rover        = LaunchConfiguration('rover', default='mecanum3')
-    map_file     = LaunchConfiguration('map')
-    wall         = LaunchConfiguration('wall')
+    gui = LaunchConfiguration('gui', default='true')
+    verbose = LaunchConfiguration('verbose', default='false')
+    rover = LaunchConfiguration('rover', default='mecanum3')
+    map_file = LaunchConfiguration('map')
+    wall = LaunchConfiguration('wall')
 
     # --------------------------------------------------
     # Package shares
     # --------------------------------------------------
     pkg_gzb = FindPackageShare('mecanumrover3_gazebo')
-    nav_pkg    = FindPackageShare('mecanumrover3_navigation')
+    nav_pkg = FindPackageShare('mecanumrover3_navigation')
 
     # --------------------------------------------------
     # Default map (FULL PATH)
@@ -43,15 +43,17 @@ def generate_launch_description():
 
     # --------------------------------------------------
     # Auto-select Nav2 params by rover type
+    # Gazebo only: mecanum3 uses a lighter params file.
     # --------------------------------------------------
-    auto_params_file = PythonExpression([
-        '"', nav_pkg, '/config/',
-        '" + ('
-        '"mecanum3_nav2_params.yaml" if "', rover, '" == "mecanum3" else '
-        '"g120a_nav2_params.yaml" if "', rover, '" == "g120a" else '
-        '"g40a_lb_nav2_params.yaml" if "', rover, '" == "g40a_lb" else '
-        '"nav2_params.yaml"'
-        ')'
+    auto_params_file = PathJoinSubstitution([
+        nav_pkg,
+        'config',
+        PythonExpression([
+            '"mecanum3_nav2_params.yaml" if "', rover, '" == "mecanum3" else '
+            '"g120a_nav2_params.yaml" if "', rover, '" == "g120a" else '
+            '"g40a_lb_nav2_params.yaml" if "', rover, '" == "g40a_lb" else '
+            '"nav2_params.yaml"'
+        ])
     ])
 
     # --------------------------------------------------
@@ -85,7 +87,7 @@ def generate_launch_description():
             ])
         ),
         launch_arguments={
-            'mesh_uri': wall,
+            'wall': wall,
         }.items()
     )
 
@@ -150,4 +152,3 @@ def generate_launch_description():
         spawn_wall,
         navigation,
     ])
-

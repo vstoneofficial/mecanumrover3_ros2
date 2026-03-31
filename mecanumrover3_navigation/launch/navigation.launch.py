@@ -126,7 +126,7 @@ def generate_launch_description():
             launch_arguments={
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
-                'params_file': mecanum3_param_dir}.items(),
+                'params_file': g40a_lb_param_dir}.items(),
         ),
 
         Node(

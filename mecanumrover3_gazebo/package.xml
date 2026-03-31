@@ -12,6 +12,8 @@
   <depend>launch</depend>
   <depend>launch_ros</depend>
   <depend>ament_index_python</depend>
+  <depend>xacro</depend>
+  <depend>gazebo_ros</depend>
   <depend>rviz2</depend>
   <depend>slam_toolbox</depend>
   <depend>mecanumrover_description</depend>

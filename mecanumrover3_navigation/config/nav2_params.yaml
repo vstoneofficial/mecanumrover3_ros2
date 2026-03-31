@@ -268,7 +268,7 @@ map_server:
     # When using a launch file with the 'map:=' substitution (e.g. nav_robot.launch.py),
     # that value will override this setting.
     # Set the full path to your desired map YAML file below.
-    yaml_filename: "~/ros2_ws/src/mecanumrover3_ros2/mecanumrover3_navigation/maps/MAP_NAME.yaml"
+    yaml_filename: "maps/MAP_NAME.yaml"
     topic_name: "map"
     frame_id: "map"
 

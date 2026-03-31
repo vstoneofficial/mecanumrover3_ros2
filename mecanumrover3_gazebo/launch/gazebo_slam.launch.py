@@ -5,9 +5,12 @@
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import (
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from ament_index_python.packages import get_package_share_directory
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
@@ -16,14 +19,15 @@ def generate_launch_description():
     # Launch arguments
     # --------------------------------------------------
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    gui          = LaunchConfiguration('gui', default='true')
     rover        = LaunchConfiguration('rover', default='mecanum3')
     wall         = LaunchConfiguration('wall', default='Wall.stl')
 
     # --------------------------------------------------
-    # Package paths
+    # Package shares
     # --------------------------------------------------
-    pkg_gzb = get_package_share_directory('mecanumrover3_gazebo')
-    pkg_nav = get_package_share_directory('mecanumrover3_navigation')
+    pkg_gzb = FindPackageShare('mecanumrover3_gazebo')
+    nav_pkg = FindPackageShare('mecanumrover3_navigation')
 
     # --------------------------------------------------
     # RViz config (passed to SLAM launch)
@@ -31,7 +35,7 @@ def generate_launch_description():
     rviz_config = LaunchConfiguration(
         'rvizconfig',
         default=PathJoinSubstitution([
-            pkg_nav, 'rviz', 'slam.rviz'
+            nav_pkg, 'rviz', 'slam.rviz'
         ])
     )
 
@@ -49,6 +53,7 @@ def generate_launch_description():
         launch_arguments={
             'use_sim_time': use_sim_time,
             'rover': rover,
+            'gui': gui,
         }.items()
     )
 
@@ -74,13 +79,14 @@ def generate_launch_description():
     slam = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([
-                pkg_nav,
+                nav_pkg,
                 'launch',
                 'slam.launch.py'
             ])
         ),
         launch_arguments={
             'rvizconfig': rviz_config,
+            'use_sim_time': use_sim_time,
         }.items()
     )
 
@@ -109,7 +115,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'rvizconfig',
             default_value=PathJoinSubstitution([
-                pkg_nav, 'rviz', 'slam.rviz'
+                nav_pkg, 'rviz', 'slam.rviz'
             ])
         ),
 
@@ -117,4 +123,3 @@ def generate_launch_description():
         spawn_wall,
         slam,
     ])
-
