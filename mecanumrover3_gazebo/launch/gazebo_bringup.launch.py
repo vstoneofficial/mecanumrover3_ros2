@@ -1,17 +1,23 @@
 import os
 import subprocess
 import tempfile
-from launch import LaunchDescription
-from launch.actions import (DeclareLaunchArgument, ExecuteProcess, LogInfo, OpaqueFunction, RegisterEventHandler, SetLaunchConfiguration,)
-from launch.event_handlers import OnShutdown
-from launch.substitutions import LaunchConfiguration, FindExecutable, Command
-from launch_ros.actions import Node
+
 from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import (
+    DeclareLaunchArgument,
+    ExecuteProcess,
+    LogInfo,
+    OpaqueFunction,
+    RegisterEventHandler,
+    SetLaunchConfiguration,
+)
+from launch.event_handlers import OnShutdown
+from launch.substitutions import Command, FindExecutable, LaunchConfiguration
+from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
-# =========================================================
-# Safe kill gazebo (same as fwdsrover)
-# =========================================================
 def _safe_kill_gazebo(context, *args, **kwargs):
     has_gzserver = subprocess.run(
         ["pgrep", "gzserver"], stdout=subprocess.DEVNULL
@@ -27,9 +33,6 @@ def _safe_kill_gazebo(context, *args, **kwargs):
     return [LogInfo(msg="[gazebo_bringup] Safe kill done (no chain events)")]
 
 
-# =========================================================
-# Generate world (same responsibility as fwdsrover)
-# =========================================================
 def _make_world_with_state(context, *args, **kwargs):
     physics_type = LaunchConfiguration("physics").perform(context)
     if physics_type not in ("ode", "bullet"):
@@ -82,29 +85,26 @@ def _create_urdf_and_rsp(context, *args, **kwargs):
     elif rover == "g40a_lb":
         xacro_file = os.path.join(urdf_dir, "g40a_lb.xacro")
     else:
-        raise RuntimeError(
-            f"[gazebo_bringup] Unknown rover type: {rover}"
-        )
+        raise RuntimeError(f"[gazebo_bringup] Unknown rover type: {rover}")
 
     fd, urdf_path = tempfile.mkstemp(prefix="robot_", suffix=".urdf")
     os.close(fd)
 
-    # Generate URDF file for Gazebo spawn
     gen = ExecuteProcess(
         cmd=[FindExecutable(name="xacro"), xacro_file, "-o", urdf_path],
         output="screen",
     )
 
-    # robot_state_publisher must use Command substitution (official way)
     rsp = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        name="robot_state_publisher",
+        name="mecanumrover_robot_state_publisher",
         output="screen",
         parameters=[
             {
-                "robot_description": Command(
-                    [FindExecutable(name="xacro"), " ", xacro_file]
+                "robot_description": ParameterValue(
+                    Command([FindExecutable(name="xacro"), " ", xacro_file]),
+                    value_type=str,
                 ),
                 "use_sim_time": True,
             }
@@ -119,30 +119,21 @@ def _create_urdf_and_rsp(context, *args, **kwargs):
     ]
 
 
-
-
-# =========================================================
-# Cleanup temp files (same as fwdsrover)
-# =========================================================
 def _cleanup_temp_files(context, *args, **kwargs):
     world_path = LaunchConfiguration("world_path").perform(context)
     urdf_path = LaunchConfiguration("urdf_path").perform(context)
 
-    for p in (world_path, urdf_path):
+    for path in (world_path, urdf_path):
         try:
-            if p and os.path.exists(p):
-                os.remove(p)
+            if path and os.path.exists(path):
+                os.remove(path)
         except Exception:
             pass
 
     return [LogInfo(msg="[gazebo_bringup] Cleaned up temp files")]
 
 
-# =========================================================
-# Main
-# =========================================================
 def generate_launch_description():
-
     rover = LaunchConfiguration("rover")
     gui = LaunchConfiguration("gui")
     world_path = LaunchConfiguration("world_path")
@@ -154,7 +145,10 @@ def generate_launch_description():
 
     gazebo = ExecuteProcess(
         cmd=[
-            "ros2", "launch", "gazebo_ros", "gazebo.launch.py",
+            "ros2",
+            "launch",
+            "gazebo_ros",
+            "gazebo.launch.py",
             ["gui:=", gui],
             ["world:=", world_path],
         ],
@@ -163,17 +157,26 @@ def generate_launch_description():
 
     spawn = ExecuteProcess(
         cmd=[
-            "ros2", "run", "gazebo_ros", "spawn_entity.py",
-            "-entity", rover,
-            "-file", urdf_path,
-            "-z", "0.03",
+            "ros2",
+            "run",
+            "gazebo_ros",
+            "spawn_entity.py",
+            "-entity",
+            rover,
+            "-file",
+            urdf_path,
+            "-z",
+            "0.03",
         ],
         output="screen",
     )
 
     jsb = ExecuteProcess(
         cmd=[
-            "ros2", "run", "controller_manager", "spawner",
+            "ros2",
+            "run",
+            "controller_manager",
+            "spawner",
             "joint_state_broadcaster",
         ],
         output="screen",
@@ -181,7 +184,10 @@ def generate_launch_description():
 
     wheel = ExecuteProcess(
         cmd=[
-            "ros2", "run", "controller_manager", "spawner",
+            "ros2",
+            "run",
+            "controller_manager",
+            "spawner",
             "wheel_velocity_controller",
         ],
         output="screen",
@@ -198,10 +204,7 @@ def generate_launch_description():
                 "scripts",
                 "rover_twist_relay.yaml",
             ),
-            {
-                "rover": rover,
-                "use_sim_time": True,
-            },
+            {"rover": rover, "use_sim_time": True},
         ],
     )
 
@@ -221,21 +224,20 @@ def generate_launch_description():
         OnShutdown(on_shutdown=[OpaqueFunction(function=_cleanup_temp_files)])
     )
 
-    return LaunchDescription([
-        DeclareLaunchArgument("gui", default_value="true"),
-        DeclareLaunchArgument("rover", default_value="mecanum3"),
-        DeclareLaunchArgument("physics", default_value="ode"),
-
-
-        safe_kill,
-        make_world,
-        create_urdf_and_rsp,
-        gazebo,
-        spawn,
-        jsb,
-        wheel,
-        rover_twist_relay,
-        gazebo_odom_bridge,
-        on_shutdown_cleanup,
-    ])
-
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument("gui", default_value="true"),
+            DeclareLaunchArgument("rover", default_value="mecanum3"),
+            DeclareLaunchArgument("physics", default_value="ode"),
+            safe_kill,
+            make_world,
+            create_urdf_and_rsp,
+            gazebo,
+            spawn,
+            jsb,
+            wheel,
+            rover_twist_relay,
+            gazebo_odom_bridge,
+            on_shutdown_cleanup,
+        ]
+    )
