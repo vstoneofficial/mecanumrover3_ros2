@@ -67,12 +67,15 @@ ros2_ws/src
 2. このリポジトリをワークスペースにクローンしてください。
 
    ```bash
+   source /opt/ros/humble/setup.bash
    mkdir -p "$HOME/ros2_ws/src"
    cd "$HOME/ros2_ws/src"
-   git clone -b humble_gazebo https://github.com/vstoneofficial/mecanumrover3_ros2.git --recurse-submodules
-   git clone -b $ROS_DISTRO https://github.com/vstoneofficial/vs_rover_options_description.git
+   git clone https://github.com/vstoneofficial/mecanumrover3_ros2.git --recurse-submodules
+   git clone https://github.com/vstoneofficial/vs_rover_options_description.git
+   sudo apt update
    sudo xargs -a mecanumrover3_ros2/packages.txt apt install -y
-   rosdep install -r --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
+   rosdep update
+   rosdep install -r --from-paths . --ignore-src --rosdistro humble -y
    ```
 
 3. ワークスペースをビルドします。
